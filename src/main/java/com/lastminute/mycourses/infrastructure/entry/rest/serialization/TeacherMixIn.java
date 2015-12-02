@@ -1,4 +1,4 @@
-package com.lastminute.mycourses.it.infrastructure.entry.rest.deserialization;
+package com.lastminute.mycourses.infrastructure.entry.rest.serialization;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

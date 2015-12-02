@@ -1,6 +1,9 @@
 package com.lastminute.mycourses.domain.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Created by administrator on 1/12/15.
@@ -12,6 +15,7 @@ public class Course {
     private String description;
     private Teacher teacher;
     private BigDecimal price;
+    private Collection<Student> students = new ArrayList<Student>();
 
     public Course(Long id, String name, String description, Teacher teacher, BigDecimal price) {
         this.id = id;
@@ -41,28 +45,33 @@ public class Course {
         return id;
     }
 
+    public void addStudent(Student student) {
+        students.add(student);
+    }
+
+    public void removeStudent(Student student) {
+        students.remove(student);
+    }
+
+    public boolean containsStudent(Student student) {
+        return students.contains(student);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Course course = (Course) o;
-
-        if (id != null ? !id.equals(course.id) : course.id != null) return false;
-        if (name != null ? !name.equals(course.name) : course.name != null) return false;
-        if (description != null ? !description.equals(course.description) : course.description != null) return false;
-        if (teacher != null ? !teacher.equals(course.teacher) : course.teacher != null) return false;
-        return !(price != null ? !price.equals(course.price) : course.price != null);
-
+        return Objects.equals(id, course.id) &&
+                Objects.equals(name, course.name) &&
+                Objects.equals(description, course.description) &&
+                Objects.equals(teacher, course.teacher) &&
+                Objects.equals(price, course.price) &&
+                Objects.equals(students, course.students);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (teacher != null ? teacher.hashCode() : 0);
-        result = 31 * result + (price != null ? price.hashCode() : 0);
-        return result;
+        return Objects.hash(id, name, description, teacher, price, students);
     }
 }

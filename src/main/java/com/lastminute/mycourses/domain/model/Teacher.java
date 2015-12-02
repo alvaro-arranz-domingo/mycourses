@@ -1,5 +1,7 @@
 package com.lastminute.mycourses.domain.model;
 
+import java.util.Objects;
+
 /**
  * Created by administrator on 1/12/15.
  */
@@ -19,15 +21,12 @@ public class Teacher {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Teacher teacher = (Teacher) o;
-
-        return !(name != null ? !name.equals(teacher.name) : teacher.name != null);
-
+        return Objects.equals(name, teacher.name);
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        return Objects.hash(name);
     }
 }
