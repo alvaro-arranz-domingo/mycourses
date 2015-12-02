@@ -40,4 +40,29 @@ public class Course {
     public Long getId() {
         return id;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Course course = (Course) o;
+
+        if (id != null ? !id.equals(course.id) : course.id != null) return false;
+        if (name != null ? !name.equals(course.name) : course.name != null) return false;
+        if (description != null ? !description.equals(course.description) : course.description != null) return false;
+        if (teacher != null ? !teacher.equals(course.teacher) : course.teacher != null) return false;
+        return !(price != null ? !price.equals(course.price) : course.price != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (teacher != null ? teacher.hashCode() : 0);
+        result = 31 * result + (price != null ? price.hashCode() : 0);
+        return result;
+    }
 }
