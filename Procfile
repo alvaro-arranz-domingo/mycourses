@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT -jar  target/mycourses-0.1-SNAPSHOT.jar
