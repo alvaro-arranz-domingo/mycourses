@@ -4,20 +4,23 @@ import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
 import com.lastminute.mycourses.domain.model.Teacher;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
+import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.mail.MailSender;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 import static org.mockito.AdditionalMatchers.not;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -29,6 +32,8 @@ public class AddStudentToCourseUseCaseTest {
     private AddStudentToCourseUseCase useCase;
 
     @Mock private CourseRepository repository;
+    @Mock private MailSender mailSender;
+    @Mock private EmailNotifier emailNotifier;
 
     private Long correctCourseId = 1L;
     private Long incorrectCourseId = 0L;
@@ -41,24 +46,26 @@ public class AddStudentToCourseUseCaseTest {
         when(repository.findCourseById(correctCourseId)).thenReturn(Optional.of(course));
         when(repository.findCourseById(not(eq(correctCourseId)))).thenReturn(Optional.<Course>empty());
 
-        useCase = new AddStudentToCourseUseCase(repository);
+        useCase = new AddStudentToCourseUseCase(repository, emailNotifier);
     }
 
     @Test
     public void add_correct_student_to_existent_course() {
 
-        Course course = useCase.execute(correctCourseId, student);
+        Optional<Course> course = useCase.execute(correctCourseId, student);
 
         assertNotNull("Course returned was null", course);
-        assertTrue("Course does not contain student", course.containsStudent(student));
+        assertTrue("Course does not contain student", course.get().containsStudent(student));
+
+        verify(emailNotifier).studentEnrolled(student, course.get());
     }
 
     @Test
     public void add_correct_student_to_non_existent_course() {
 
-        Course course = useCase.execute(incorrectCourseId, student);
+        Optional<Course> course = useCase.execute(incorrectCourseId, student);
 
-        assertNull("Course was returned when incorrect course id", course);
+        assertEquals("Course was returned when incorrect course id", Optional.empty(), course);
+        verifyNoMoreInteractions(emailNotifier, mailSender);
     }
-
 }

@@ -1,9 +1,8 @@
-package com.lastminute.mycourses.it.infrastructure.entry.rest;
+package com.lastminute.mycourses.infrastructure.entry.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lastminute.mycourses.Application;
 import com.lastminute.mycourses.domain.model.Course;
-import com.lastminute.mycourses.domain.model.Student;
 import com.lastminute.mycourses.domain.model.Teacher;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 import com.lastminute.mycourses.infrastructure.repository.VolatileMapCourseRepository;
@@ -14,27 +13,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Created by administrator on 2/12/15.
+ * Created by administrator on 1/12/15.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
-public class StudentsEndPointTest {
+public class CoursesEndPointTest {
 
     private MockMvc mockMvc;
 
@@ -49,9 +48,9 @@ public class StudentsEndPointTest {
 
     private Long correctId = 1L;
     private Long incorrectId = 0L;
-    private Course course = new Course(correctId, "Integration Course", "Test course", new Teacher("TestTeacher"), BigDecimal.ZERO);
+    private String idWrongFormat = "wrongformat";
 
-    private Student student = new Student("Test name", "Test email");
+    private Course expectedCourse = new Course(correctId, "Integration Course", "Test course", new Teacher("TestTeacher"), BigDecimal.ZERO);
 
     @Before
     public void setUp() {
@@ -59,39 +58,35 @@ public class StudentsEndPointTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         VolatileMapCourseRepository volatileRepository = (VolatileMapCourseRepository) repository;
-        volatileRepository.save(course);
-
-        objectMapper.addMixIn(Course.class, CourseMixIn.class);
-        objectMapper.addMixIn(Teacher.class, TeacherMixIn.class);
+        volatileRepository.save(expectedCourse);
     }
 
     @Test
-    public void add_correct_student_to_existent_course() throws Exception {
+    public void get_existent_course() throws Exception {
 
-        mockMvc.perform(
-                post("/api/courses/" + correctId + "/students")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(student)))
-                .andExpect(status().isOk());
+        MvcResult result = mockMvc.perform(
+                get("/api/courses/" + correctId))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Course course = objectMapper.readValue(result.getResponse().getContentAsString(), Course.class);
+
+        assertThat(course, equalTo(expectedCourse));
     }
 
     @Test
-    public void add_correct_student_to_non_existent_course() throws Exception {
+    public void get_non_existent_course() throws Exception {
 
         mockMvc.perform(
-                post("/api/courses/" + incorrectId + "/students")
-                .contentType(MediaType.APPLICATION_JSON))
+                get("/api/courses/" + incorrectId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void get_course_with_wrong_id_format() throws Exception {
+
+        mockMvc.perform(
+                get("/api/courses/" + idWrongFormat))
                 .andExpect(status().isBadRequest());
     }
-
-    @Test
-    public void add_non_json_student_to_existent_course() throws Exception {
-
-        mockMvc.perform(
-                post("/api/courses/" + correctId + "/students")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
-                .andExpect(status().isBadRequest());
-    }
-
 }

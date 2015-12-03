@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 /**
  * Created by administrator on 2/12/15.
  */
@@ -28,9 +30,9 @@ public class StudentsEndPoint {
     @ResponseStatus(HttpStatus.OK)
     public void addStudent(@PathVariable Long courseId, @RequestBody Student student) throws CourseNotFoundException {
 
-        Course course = addStudentToCourseUseCase.execute(courseId, student);
+        Optional<Course> course = addStudentToCourseUseCase.execute(courseId, student);
 
-        if (course == null) {
+        if (!course.isPresent()) {
             throw new CourseNotFoundException();
         }
     }

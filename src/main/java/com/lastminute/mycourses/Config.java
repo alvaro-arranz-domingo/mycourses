@@ -1,20 +1,15 @@
 package com.lastminute.mycourses;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lastminute.mycourses.domain.model.Course;
-import com.lastminute.mycourses.domain.model.Student;
-import com.lastminute.mycourses.domain.model.Teacher;
 import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseUseCase;
 import com.lastminute.mycourses.domain.ports.primary.FindCourseUseCase;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
-import com.lastminute.mycourses.infrastructure.entry.rest.serialization.CourseMixIn;
-import com.lastminute.mycourses.infrastructure.entry.rest.serialization.StudentMixIn;
-import com.lastminute.mycourses.infrastructure.entry.rest.serialization.TeacherMixIn;
+import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
+import com.lastminute.mycourses.infrastructure.email.SimpleEmailNotifier;
 import com.lastminute.mycourses.infrastructure.repository.VolatileMapCourseRepository;
+import org.hibernate.validator.constraints.Email;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
+import org.springframework.mail.MailSender;
 
 /**
  * Created by administrator on 1/12/15.
@@ -33,8 +28,13 @@ public class Config {
     }
 
     @Bean
-    AddStudentToCourseUseCase getAddStudentToCourseUseCase(CourseRepository courseRepository) {
-        return new AddStudentToCourseUseCase(courseRepository);
+    EmailNotifier getEmailNotifier(MailSender mailSender) {
+        return new SimpleEmailNotifier(mailSender);
+    }
+
+    @Bean
+    AddStudentToCourseUseCase getAddStudentToCourseUseCase(CourseRepository courseRepository, EmailNotifier emailNotifier) {
+        return new AddStudentToCourseUseCase(courseRepository, emailNotifier);
     }
 
 }

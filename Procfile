@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -jar  target/mycourses-0.1-SNAPSHOT.jar
+web: java -Dserver.port=$PORT -Dspring.mail.username=$MAIL_USERNAME -Dspring.mail.password=$MAIL_PASSWORD -jar  target/mycourses-0.1-SNAPSHOT.jar
