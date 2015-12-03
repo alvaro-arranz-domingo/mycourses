@@ -16,8 +16,10 @@ public class Course {
     private Teacher teacher;
     private BigDecimal price;
     private Collection<Student> students = new ArrayList<Student>();
+    private int capacity;
 
-    public Course(Long id, String name, String description, Teacher teacher, BigDecimal price) {
+    public Course(Long id, String name, String description, Teacher teacher, BigDecimal price, int capacity) {
+        this.capacity = capacity;
         this.id = id;
         this.name = name;
         this.description = description;
@@ -45,8 +47,19 @@ public class Course {
         return id;
     }
 
-    public void addStudent(Student student) {
+    /**
+     * Checks if there is enough capacity in the Course. If there is not, it returns false
+     * @param student
+     * @return
+     */
+    public boolean addStudent(Student student) {
+
+        if (students.size() >= capacity) {
+            return false;
+        }
+
         students.add(student);
+        return true;
     }
 
     public void removeStudent(Student student) {
@@ -55,6 +68,10 @@ public class Course {
 
     public boolean containsStudent(Student student) {
         return students.contains(student);
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     @Override

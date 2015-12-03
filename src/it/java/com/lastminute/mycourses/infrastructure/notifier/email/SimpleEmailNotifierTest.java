@@ -37,22 +37,18 @@ import static org.hamcrest.Matchers.equalTo;
 @WebAppConfiguration
 public class SimpleEmailNotifierTest {
 
-    private SimpleEmailNotifier emailNotifier;
-
     @Autowired
-    private MailSender mailSender;
+    private SimpleEmailNotifier emailNotifier;
 
     private GreenMail greenMailSmtp;
 
-    private Course course = new Course(0L, "Integration Course", "Test course", new Teacher("TestTeacher"), BigDecimal.ZERO);
+    private Course course = new Course(0L, "Integration Course", "Test course", new Teacher("TestTeacher"), BigDecimal.ZERO, 20);
 
     private String studentEmail = "TestEmail@gmail.com";
     private Student student = new Student("Test name", studentEmail);
 
     @Before
     public void setUp() {
-
-        emailNotifier = new SimpleEmailNotifier(mailSender);
 
         Security.setProperty("ssl.SocketFactory.provider", DummySSLSocketFactory.class.getName());
         greenMailSmtp = new GreenMail(ServerSetupTest.SMTPS);

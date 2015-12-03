@@ -28,7 +28,7 @@ public class FindCourseTest {
     @Mock private CourseRepository courseRepository;
 
     private Teacher teacher = new Teacher("Teacher name");
-    private Course expectedCourse = new Course(1l, "TDD", "TDD cycle. Mocks and stubs.", teacher, BigDecimal.ONE);
+    private Course expectedCourse = new Course(1l, "TDD", "TDD cycle. Mocks and stubs.", teacher, BigDecimal.ONE, 20);
 
     private Long existingId = 1L;
     private Long missingId = 2l;

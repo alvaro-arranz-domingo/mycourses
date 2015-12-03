@@ -6,9 +6,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.*;
 
 /**
  * Created by administrator on 1/12/15.
@@ -18,8 +20,10 @@ public class VolatileMapCourseRepositoryTest {
     private VolatileMapCourseRepository courseRepository;
 
     private Course validCourse;
+    private Course otherValidCourse;
     private Long validCourseId = 1L;
     private Long missingCourseId = 0l;
+    private Long otherValidCourseId = 2L;
     private String validCourseName = "TestName";
     private String validCourseDescription = "TestDescription";
     private BigDecimal validCoursePrice = BigDecimal.ONE;
@@ -29,13 +33,16 @@ public class VolatileMapCourseRepositoryTest {
 
         courseRepository = new VolatileMapCourseRepository();
 
-        validCourse = createCourse();
+        validCourse = createCourse(validCourseId);
+        otherValidCourse = createCourse(otherValidCourseId);
+
         courseRepository.save(validCourse);
+        courseRepository.save(otherValidCourse);
     }
 
-    private Course createCourse() {
+    private Course createCourse(Long courseId) {
         Teacher teacher = new Teacher("TestTeacherName");
-        return new Course(validCourseId, validCourseName, validCourseDescription, teacher, validCoursePrice);
+        return new Course(courseId, validCourseName, validCourseDescription, teacher, validCoursePrice, 20);
     }
 
     @Test
@@ -52,6 +59,17 @@ public class VolatileMapCourseRepositoryTest {
         Optional<Course> optionalCourse = courseRepository.findCourseById(missingCourseId);
 
         assertEquals("Course", Optional.empty(), optionalCourse);
+    }
+
+    @Test
+    public void find_all_courses() {
+
+        Collection<Course> courses = courseRepository.findAll();
+
+        assertNotNull("Returned course collection is null", courses);
+        assertThat("Returned wrong number of courses", courses.size(), equalTo(2));
+        assertTrue("Returned wrong collection of courses", courses.contains(validCourse));
+        assertTrue("Returned wrong collection of courses", courses.contains(otherValidCourse));
     }
 
 }

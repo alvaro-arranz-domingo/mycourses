@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.AdditionalMatchers.not;
+import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -35,37 +36,65 @@ public class AddStudentToCourseUseCaseTest {
     @Mock private MailSender mailSender;
     @Mock private EmailNotifier emailNotifier;
 
+    @Mock private AddStudentToCourseRequest request;
+    @Mock private AddStudentToCourseResponse response;
+
     private Long correctCourseId = 1L;
     private Long incorrectCourseId = 0L;
     private Student student = new Student("nameTest", "emailTest@gmail.com");
-    private Course course = new Course(correctCourseId, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE);
+    private Course course = new Course(correctCourseId, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE, 20);
+
+    private Long fullCourseId = 2L;
+    private Course fullCourse = new Course(fullCourseId, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE, 1);
 
     @Before
     public void setUp() {
 
         when(repository.findCourseById(correctCourseId)).thenReturn(Optional.of(course));
-        when(repository.findCourseById(not(eq(correctCourseId)))).thenReturn(Optional.<Course>empty());
+        when(repository.findCourseById(fullCourseId)).thenReturn(Optional.of(fullCourse));
+        when(repository.findCourseById(not(or(eq(correctCourseId), eq(fullCourseId))))).thenReturn(Optional.<Course>empty());
 
         useCase = new AddStudentToCourseUseCase(repository, emailNotifier);
+
+        fullCourse.addStudent(student);
     }
 
     @Test
     public void add_correct_student_to_existent_course() {
 
-        Optional<Course> course = useCase.execute(correctCourseId, student);
+        when(request.getCourseId()).thenReturn(correctCourseId);
+        when(request.getStudent()).thenReturn(student);
 
-        assertNotNull("Course returned was null", course);
-        assertTrue("Course does not contain student", course.get().containsStudent(student));
+        useCase.execute(request, response);
 
-        verify(emailNotifier).studentEnrolled(student, course.get());
+        verify(response).isOk(course);
+        verifyNoMoreInteractions(response);
+        verify(emailNotifier).studentEnrolled(student, course);
     }
 
     @Test
     public void add_correct_student_to_non_existent_course() {
 
-        Optional<Course> course = useCase.execute(incorrectCourseId, student);
+        when(request.getCourseId()).thenReturn(incorrectCourseId);
+        when(request.getStudent()).thenReturn(student);
 
-        assertEquals("Course was returned when incorrect course id", Optional.empty(), course);
+        useCase.execute(request, response);
+
+        verify(response).isCourseNotFound();
+        verifyNoMoreInteractions(response);
+        verifyNoMoreInteractions(emailNotifier, mailSender);
+    }
+
+    @Test
+    public void add_correct_student_to_full_course() {
+
+        when(request.getCourseId()).thenReturn(fullCourseId);
+        when(request.getStudent()).thenReturn(student);
+
+        useCase.execute(request, response);
+
+        verify(response).isFull();
+        verifyNoMoreInteractions(response);
         verifyNoMoreInteractions(emailNotifier, mailSender);
     }
 }

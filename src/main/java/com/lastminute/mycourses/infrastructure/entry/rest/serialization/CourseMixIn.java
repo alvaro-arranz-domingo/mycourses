@@ -12,5 +12,5 @@ public abstract class CourseMixIn {
 
     CourseMixIn(@JsonProperty("id") Long id, @JsonProperty("name") String name,
                 @JsonProperty("description") String description, @JsonProperty("teacher") Teacher teacher,
-                @JsonProperty("price")BigDecimal price){}
+                @JsonProperty("price")BigDecimal price, @JsonProperty("capacity")int capacity){}
 }

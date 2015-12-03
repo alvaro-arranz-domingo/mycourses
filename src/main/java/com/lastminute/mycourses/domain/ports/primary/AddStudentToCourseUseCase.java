@@ -4,8 +4,6 @@ import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 
 import java.util.Optional;
 
@@ -22,35 +20,21 @@ public class AddStudentToCourseUseCase {
         this.emailNotifier = emailNotifier;
     }
 
-    public Optional<Course> execute(Long courseId, Student student) {
+    public void execute(AddStudentToCourseRequest request, AddStudentToCourseResponse response) {
 
-        Optional<Course> course = repository.findCourseById(courseId);
+        Optional<Course> course = repository.findCourseById(request.getCourseId());
 
         if (!course.isPresent()) {
-            return Optional.empty();
+            response.isCourseNotFound();
+            return;
         }
 
-        course.get().addStudent(student);
-        emailNotifier.studentEnrolled(student, course.get());
-        return course;
-    }
-
-    private void sendNotificationEmail(String to, String subject, String message) {
-
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(to);
-        msg.setText(message);
-        msg.setSubject(subject);
-
-        try{
-            //mailSender.send(msg);
+        if (!course.get().addStudent(request.getStudent())) {
+            response.isFull();
+            return;
         }
-        catch (MailException ex) {
-            System.err.println(ex.getMessage());
-        }
-    }
 
-    private String createEmailMessage(String studentName, String courseName) {
-        return "Dear " + studentName + ", thank you for your subscription to course " + courseName;
+        response.isOk(course.get());
+        emailNotifier.studentEnrolled(request.getStudent(), course.get());
     }
 }

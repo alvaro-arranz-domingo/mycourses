@@ -1,6 +1,7 @@
 package com.lastminute.mycourses;
 
 import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseUseCase;
+import com.lastminute.mycourses.domain.ports.primary.FindAllCoursesUseCase;
 import com.lastminute.mycourses.domain.ports.primary.FindCourseUseCase;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
@@ -35,6 +36,11 @@ public class Config {
     @Bean
     AddStudentToCourseUseCase getAddStudentToCourseUseCase(CourseRepository courseRepository, EmailNotifier emailNotifier) {
         return new AddStudentToCourseUseCase(courseRepository, emailNotifier);
+    }
+
+    @Bean
+    FindAllCoursesUseCase getFindAllCoursesUseCase(CourseRepository courseRepository) {
+        return new FindAllCoursesUseCase(courseRepository);
     }
 
 }

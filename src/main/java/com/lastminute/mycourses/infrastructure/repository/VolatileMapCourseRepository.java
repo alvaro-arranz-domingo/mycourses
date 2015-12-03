@@ -3,6 +3,7 @@ package com.lastminute.mycourses.infrastructure.repository;
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,11 @@ public class VolatileMapCourseRepository implements CourseRepository {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public Collection<Course> findAll() {
+        return courseMap.values();
     }
 
     public void save(Course course) {

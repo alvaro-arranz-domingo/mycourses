@@ -37,7 +37,8 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         VolatileMapCourseRepository volatileMapCourseRepository = (VolatileMapCourseRepository) courseRepository;
-        volatileMapCourseRepository.save(new Course(100L, "Integration Course", "Test course", new Teacher("TestTeacher"), BigDecimal.ZERO));
+        volatileMapCourseRepository.save(new Course(100L, "Integration Course", "Test course", new Teacher("TestTeacher"), BigDecimal.ZERO, 20));
+        volatileMapCourseRepository.save(new Course(101L, "Maths", "101 on Maths", new Teacher("Alfredo"), BigDecimal.ONE, 3));
     }
 
     @PostConstruct

@@ -28,7 +28,7 @@ public class SimpleEmailNotifierTest {
     @Mock private MailSender mailSender;
 
     private Student student = new Student("nameTest", "emailTest@gmail.com");
-    private Course course = new Course(0L, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE);
+    private Course course = new Course(0L, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE, 20);
 
     @Before
     public void setUp() {

@@ -2,12 +2,15 @@ package com.lastminute.mycourses.infrastructure.entry.rest;
 
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
+import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseRequest;
+import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseResponse;
 import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseUseCase;
 import com.lastminute.mycourses.infrastructure.entry.rest.exceptions.CourseNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -27,13 +30,13 @@ public class StudentsEndPoint {
     }
 
     @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public void addStudent(@PathVariable Long courseId, @RequestBody Student student) throws CourseNotFoundException {
+    public ResponseEntity<Void> addStudent(@PathVariable Long courseId, @RequestBody Student student) {
 
-        Optional<Course> course = addStudentToCourseUseCase.execute(courseId, student);
+        AddStudentToCourseRestRequest request = new AddStudentToCourseRestRequest(courseId, student);
+        AddStudentToCourseRestResponse response = new AddStudentToCourseRestResponse();
 
-        if (!course.isPresent()) {
-            throw new CourseNotFoundException();
-        }
+        addStudentToCourseUseCase.execute(request, response);
+
+        return response.getStatus();
     }
 }

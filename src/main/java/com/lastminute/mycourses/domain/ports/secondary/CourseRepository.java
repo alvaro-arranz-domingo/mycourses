@@ -2,6 +2,7 @@ package com.lastminute.mycourses.domain.ports.secondary;
 
 import com.lastminute.mycourses.domain.model.Course;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -10,4 +11,6 @@ import java.util.Optional;
 public interface CourseRepository {
 
     Optional<Course> findCourseById(Long id);
+
+    Collection<Course> findAll();
 }
