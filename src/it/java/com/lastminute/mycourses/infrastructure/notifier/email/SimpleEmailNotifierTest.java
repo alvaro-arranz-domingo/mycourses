@@ -9,6 +9,7 @@ import com.lastminute.mycourses.domain.model.Student;
 import com.lastminute.mycourses.domain.model.Teacher;
 import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
 import com.lastminute.mycourses.infrastructure.email.SimpleEmailNotifier;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,7 +69,7 @@ public class SimpleEmailNotifierTest {
         assertThat("Wrong email recipient", studentEmail, equalTo(messages[0].getAllRecipients()[0].toString()));
     }
 
-    @Before
+    @After
     public void tearDown() {
 
         greenMailSmtp.stop();
