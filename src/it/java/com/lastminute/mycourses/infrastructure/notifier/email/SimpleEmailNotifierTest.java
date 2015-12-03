@@ -68,4 +68,10 @@ public class SimpleEmailNotifierTest {
         assertThat("Wrong email recipient", studentEmail, equalTo(messages[0].getAllRecipients()[0].toString()));
     }
 
+    @Before
+    public void tearDown() {
+
+        greenMailSmtp.stop();
+    }
+
 }
