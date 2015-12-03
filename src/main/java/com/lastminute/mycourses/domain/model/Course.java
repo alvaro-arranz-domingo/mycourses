@@ -16,9 +16,9 @@ public class Course {
     private Teacher teacher;
     private BigDecimal price;
     private Collection<Student> students = new ArrayList<Student>();
-    private int capacity;
+    private Integer capacity;
 
-    public Course(Long id, String name, String description, Teacher teacher, BigDecimal price, int capacity) {
+    public Course(Long id, String name, String description, Teacher teacher, BigDecimal price, Integer capacity) {
         this.capacity = capacity;
         this.id = id;
         this.name = name;
@@ -84,11 +84,12 @@ public class Course {
                 Objects.equals(description, course.description) &&
                 Objects.equals(teacher, course.teacher) &&
                 Objects.equals(price, course.price) &&
-                Objects.equals(students, course.students);
+                Objects.equals(students, course.students) &&
+                Objects.equals(capacity, course.capacity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, teacher, price, students);
+        return Objects.hash(id, name, description, teacher, price, students, capacity);
     }
 }

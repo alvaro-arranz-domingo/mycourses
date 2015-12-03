@@ -1,6 +1,5 @@
 package com.lastminute.mycourses.infrastructure.entry.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icegreen.greenmail.util.DummySSLSocketFactory;
 import com.icegreen.greenmail.util.GreenMail;
@@ -8,7 +7,8 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.lastminute.mycourses.Application;
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
-import com.lastminute.mycourses.domain.model.Teacher;
+import com.lastminute.mycourses.domain.model.factory.CourseMother;
+import com.lastminute.mycourses.domain.model.factory.StudentMother;
 import com.lastminute.mycourses.infrastructure.repository.VolatileMapCourseRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.mail.Message;
-import java.math.BigDecimal;
 import java.security.Security;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -58,13 +57,12 @@ public class StudentsEndPointTest {
 
     private Long correctCourseId = 1L;
     private Long incorrectCourseId = 0L;
-    private Course course = new Course(correctCourseId, "Integration Course", "Test course", new Teacher("TestTeacher"), BigDecimal.ZERO, 20);
+    private Course course = CourseMother.createCorrectTestCourse(correctCourseId);
 
-    private String studentEmail = "TestEmail@gmail.com";
-    private Student student = new Student("Test name", studentEmail);
+    private Student student = StudentMother.createCorrectTestStudent();
 
     private Long fullCourseId = 2L;
-    private Course fullCourse = new Course(fullCourseId, "Integration Course", "Test course", new Teacher("TestTeacher"), BigDecimal.ZERO, 1);
+    private Course fullCourse = CourseMother.createCorrectTestCourseWithCapacity(fullCourseId, 1);
 
     @Before
     public void setUp() {
@@ -92,7 +90,7 @@ public class StudentsEndPointTest {
 
         Message[] messages = greenMailSmtp.getReceivedMessages();
         assertThat("Wrong number of emails sent", messages.length, equalTo(1));
-        assertThat("Wrong email recipient", studentEmail, equalTo(messages[0].getAllRecipients()[0].toString()));
+        assertThat("Wrong email recipient", student.getEmailAddress(), equalTo(messages[0].getAllRecipients()[0].toString()));
     }
 
     @Test

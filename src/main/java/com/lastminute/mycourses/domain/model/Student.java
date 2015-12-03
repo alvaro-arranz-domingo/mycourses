@@ -7,10 +7,12 @@ public class Student {
 
     public String name;
     public String emailAddress;
+    public VisaCard visaCard;
 
-    public Student(String name, String emailAddress) {
+    public Student(String name, String emailAddress, VisaCard visaCard) {
         this.name = name;
         this.emailAddress = emailAddress;
+        this.visaCard = visaCard;
     }
 
     public String getEmailAddress() {
@@ -21,4 +23,7 @@ public class Student {
         return name;
     }
 
+    public VisaCard getVisaCard() {
+        return visaCard;
+    }
 }

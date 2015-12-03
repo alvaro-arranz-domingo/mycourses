@@ -2,6 +2,7 @@ package com.lastminute.mycourses.infrastructure.repository;
 
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Teacher;
+import com.lastminute.mycourses.domain.model.factory.CourseMother;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,30 +20,20 @@ public class VolatileMapCourseRepositoryTest {
 
     private VolatileMapCourseRepository courseRepository;
 
-    private Course validCourse;
-    private Course otherValidCourse;
     private Long validCourseId = 1L;
     private Long missingCourseId = 0l;
     private Long otherValidCourseId = 2L;
-    private String validCourseName = "TestName";
-    private String validCourseDescription = "TestDescription";
-    private BigDecimal validCoursePrice = BigDecimal.ONE;
+
+    private Course validCourse = CourseMother.createCorrectTestCourse(validCourseId);
+    private Course otherValidCourse = CourseMother.createCorrectTestCourse(otherValidCourseId);
 
     @Before
     public void setUp() {
 
         courseRepository = new VolatileMapCourseRepository();
 
-        validCourse = createCourse(validCourseId);
-        otherValidCourse = createCourse(otherValidCourseId);
-
         courseRepository.save(validCourse);
         courseRepository.save(otherValidCourse);
-    }
-
-    private Course createCourse(Long courseId) {
-        Teacher teacher = new Teacher("TestTeacherName");
-        return new Course(courseId, validCourseName, validCourseDescription, teacher, validCoursePrice, 20);
     }
 
     @Test

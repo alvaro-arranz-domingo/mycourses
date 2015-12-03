@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
 import com.lastminute.mycourses.domain.model.Teacher;
+import com.lastminute.mycourses.domain.model.VisaCard;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 import com.lastminute.mycourses.infrastructure.entry.rest.serialization.CourseMixIn;
 import com.lastminute.mycourses.infrastructure.entry.rest.serialization.StudentMixIn;
 import com.lastminute.mycourses.infrastructure.entry.rest.serialization.TeacherMixIn;
+import com.lastminute.mycourses.infrastructure.entry.rest.serialization.VisaCardMixin;
 import com.lastminute.mycourses.infrastructure.repository.VolatileMapCourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -46,5 +48,6 @@ public class Application implements CommandLineRunner {
         objectMapper.addMixIn(Course.class, CourseMixIn.class);
         objectMapper.addMixIn(Teacher.class, TeacherMixIn.class);
         objectMapper.addMixIn(Student.class, StudentMixIn.class);
+        objectMapper.addMixIn(VisaCard.class, VisaCardMixin.class);
     }
 }

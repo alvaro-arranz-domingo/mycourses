@@ -2,6 +2,7 @@ package com.lastminute.mycourses.domain.ports.primary;
 
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Teacher;
+import com.lastminute.mycourses.domain.model.factory.CourseMother;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +29,7 @@ public class FindCourseTest {
     @Mock private CourseRepository courseRepository;
 
     private Teacher teacher = new Teacher("Teacher name");
-    private Course expectedCourse = new Course(1l, "TDD", "TDD cycle. Mocks and stubs.", teacher, BigDecimal.ONE, 20);
+    private Course expectedCourse = CourseMother.createCorrectTestCourse(1L);
 
     private Long existingId = 1L;
     private Long missingId = 2l;

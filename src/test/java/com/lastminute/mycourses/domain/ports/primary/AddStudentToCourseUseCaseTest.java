@@ -2,7 +2,8 @@ package com.lastminute.mycourses.domain.ports.primary;
 
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
-import com.lastminute.mycourses.domain.model.Teacher;
+import com.lastminute.mycourses.domain.model.factory.CourseMother;
+import com.lastminute.mycourses.domain.model.factory.StudentMother;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
 import org.junit.Before;
@@ -12,10 +13,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mail.MailSender;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.Matchers.any;
@@ -41,11 +40,11 @@ public class AddStudentToCourseUseCaseTest {
 
     private Long correctCourseId = 1L;
     private Long incorrectCourseId = 0L;
-    private Student student = new Student("nameTest", "emailTest@gmail.com");
-    private Course course = new Course(correctCourseId, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE, 20);
+    private Student student = StudentMother.createCorrectTestStudent();
+    private Course course = CourseMother.createCorrectTestCourse(correctCourseId);
 
     private Long fullCourseId = 2L;
-    private Course fullCourse = new Course(fullCourseId, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE, 1);
+    private Course fullCourse = CourseMother.createCorrectTestCourseWithCapacity(fullCourseId, 1);
 
     @Before
     public void setUp() {

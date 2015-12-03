@@ -2,6 +2,7 @@ package com.lastminute.mycourses.domain.ports.primary;
 
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Teacher;
+import com.lastminute.mycourses.domain.model.factory.CourseMother;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 import com.lastminute.mycourses.infrastructure.repository.VolatileMapCourseRepository;
 import org.junit.Before;
@@ -32,8 +33,8 @@ public class FindAllCoursesUseCaseTest {
     private Long course1Id = 0L;
     private Long course2Id = 1L;
 
-    private Course course1 = new Course(course1Id, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE, 20);
-    private Course course2 = new Course(course2Id, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE, 20);
+    private Course course1 = CourseMother.createCorrectTestCourse(course1Id);
+    private Course course2 = CourseMother.createCorrectTestCourse(course2Id);
 
     private Collection<Course> expectedCourses = new ArrayList<Course>();
 

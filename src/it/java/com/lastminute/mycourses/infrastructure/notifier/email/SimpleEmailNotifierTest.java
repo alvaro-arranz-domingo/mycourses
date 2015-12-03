@@ -7,6 +7,8 @@ import com.lastminute.mycourses.Application;
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
 import com.lastminute.mycourses.domain.model.Teacher;
+import com.lastminute.mycourses.domain.model.factory.CourseMother;
+import com.lastminute.mycourses.domain.model.factory.StudentMother;
 import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
 import com.lastminute.mycourses.infrastructure.email.SimpleEmailNotifier;
 import org.junit.After;
@@ -42,10 +44,9 @@ public class SimpleEmailNotifierTest {
 
     private GreenMail greenMailSmtp;
 
-    private Course course = new Course(0L, "Integration Course", "Test course", new Teacher("TestTeacher"), BigDecimal.ZERO, 20);
+    private Course course = CourseMother.createCorrectTestCourse(0L);
 
-    private String studentEmail = "TestEmail@gmail.com";
-    private Student student = new Student("Test name", studentEmail);
+    private Student student = StudentMother.createCorrectTestStudent();
 
     @Before
     public void setUp() {
@@ -62,7 +63,7 @@ public class SimpleEmailNotifierTest {
 
         Message[] messages = greenMailSmtp.getReceivedMessages();
         assertThat("Wrong number of emails sent", messages.length, equalTo(1));
-        assertThat("Wrong email recipient", studentEmail, equalTo(messages[0].getAllRecipients()[0].toString()));
+        assertThat("Wrong email recipient", student.getEmailAddress(), equalTo(messages[0].getAllRecipients()[0].toString()));
     }
 
     @After

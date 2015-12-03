@@ -3,6 +3,8 @@ package com.lastminute.mycourses.infrastructure.email;
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
 import com.lastminute.mycourses.domain.model.Teacher;
+import com.lastminute.mycourses.domain.model.factory.CourseMother;
+import com.lastminute.mycourses.domain.model.factory.StudentMother;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,8 +29,8 @@ public class SimpleEmailNotifierTest {
 
     @Mock private MailSender mailSender;
 
-    private Student student = new Student("nameTest", "emailTest@gmail.com");
-    private Course course = new Course(0L, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE, 20);
+    private Student student = StudentMother.createCorrectTestStudent();
+    private Course course = CourseMother.createCorrectTestCourse(0L);
 
     @Before
     public void setUp() {
