@@ -18,17 +18,22 @@ public class AddStudentToCourseRestResponse implements AddStudentToCourseRespons
     }
 
     @Override
-    public void isFull() {
-        entity = new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
+    public void courseFull() {
+        entity = new ResponseEntity<Void>(HttpStatus.CONFLICT);
     }
 
     @Override
-    public void isCourseNotFound() {
+    public void courseNotFound() {
         entity = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
     }
 
     @Override
-    public void isOk(Course course) {
+    public void paymentFailed() {
+        entity = new ResponseEntity<Void>(HttpStatus.CONFLICT);
+    }
+
+    @Override
+    public void enrolled(Course course) {
         entity = new ResponseEntity<Void>(HttpStatus.OK);
     }
 }

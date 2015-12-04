@@ -1,9 +1,8 @@
-package com.lastminute.mycourses.infrastructure.email;
+package com.lastminute.mycourses.infrastructure.notifier.email;
 
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
 import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;

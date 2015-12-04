@@ -6,25 +6,20 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.lastminute.mycourses.Application;
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
-import com.lastminute.mycourses.domain.model.Teacher;
 import com.lastminute.mycourses.domain.model.factory.CourseMother;
 import com.lastminute.mycourses.domain.model.factory.StudentMother;
-import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
-import com.lastminute.mycourses.infrastructure.email.SimpleEmailNotifier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.mail.MailSender;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import java.math.BigDecimal;
 import java.security.Security;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,8 +40,7 @@ public class SimpleEmailNotifierTest {
     private GreenMail greenMailSmtp;
 
     private Course course = CourseMother.createCorrectTestCourse(0L);
-
-    private Student student = StudentMother.createCorrectTestStudent();
+    private Student student = StudentMother.createCorrectTestStudent(1L);
 
     @Before
     public void setUp() {

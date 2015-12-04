@@ -17,4 +17,8 @@ public class CourseMother {
     static public Course createCorrectTestCourseWithCapacity(Long id, Integer capacity) {
         return new Course(id, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.ONE, capacity);
     }
+
+    static public Course createCorrectTestCourseForPayment(Long id) {
+        return new Course(id, "TDD", "TDD cycle. Mocks and stubs.", new Teacher("Teacher name"), BigDecimal.valueOf(400), 20);
+    }
 }

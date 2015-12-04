@@ -7,9 +7,11 @@ import com.lastminute.mycourses.domain.model.Course;
  */
 public interface AddStudentToCourseResponse {
 
-    void isFull();
+    void courseFull();
 
-    void isCourseNotFound();
+    void courseNotFound();
 
-    void isOk(Course course);
+    void paymentFailed();
+
+    void enrolled(Course course);
 }

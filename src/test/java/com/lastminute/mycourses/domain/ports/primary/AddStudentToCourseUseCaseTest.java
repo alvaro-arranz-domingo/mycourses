@@ -6,15 +6,17 @@ import com.lastminute.mycourses.domain.model.factory.CourseMother;
 import com.lastminute.mycourses.domain.model.factory.StudentMother;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 import com.lastminute.mycourses.domain.ports.secondary.EmailNotifier;
+import com.lastminute.mycourses.domain.ports.secondary.PaymentGateway;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.mail.MailSender;
 
 import java.util.Optional;
 
+import static junit.framework.TestCase.assertFalse;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.Matchers.any;
@@ -32,15 +34,15 @@ public class AddStudentToCourseUseCaseTest {
     private AddStudentToCourseUseCase useCase;
 
     @Mock private CourseRepository repository;
-    @Mock private MailSender mailSender;
     @Mock private EmailNotifier emailNotifier;
+    @Mock private PaymentGateway paymentGateway;
 
     @Mock private AddStudentToCourseRequest request;
     @Mock private AddStudentToCourseResponse response;
 
     private Long correctCourseId = 1L;
     private Long incorrectCourseId = 0L;
-    private Student student = StudentMother.createCorrectTestStudent();
+    private Student student = StudentMother.createCorrectTestStudent(1L);
     private Course course = CourseMother.createCorrectTestCourse(correctCourseId);
 
     private Long fullCourseId = 2L;
@@ -53,7 +55,9 @@ public class AddStudentToCourseUseCaseTest {
         when(repository.findCourseById(fullCourseId)).thenReturn(Optional.of(fullCourse));
         when(repository.findCourseById(not(or(eq(correctCourseId), eq(fullCourseId))))).thenReturn(Optional.<Course>empty());
 
-        useCase = new AddStudentToCourseUseCase(repository, emailNotifier);
+        when(paymentGateway.payCourse(student, course)).thenReturn(true);
+
+        useCase = new AddStudentToCourseUseCase(repository, emailNotifier, paymentGateway);
 
         fullCourse.addStudent(student);
     }
@@ -66,9 +70,10 @@ public class AddStudentToCourseUseCaseTest {
 
         useCase.execute(request, response);
 
-        verify(response).isOk(course);
-        verifyNoMoreInteractions(response);
         verify(emailNotifier).studentEnrolled(student, course);
+        verify(paymentGateway).payCourse(student, course);
+        verify(response).enrolled(course);
+        verifyNoMoreInteractions(response);
     }
 
     @Test
@@ -79,9 +84,9 @@ public class AddStudentToCourseUseCaseTest {
 
         useCase.execute(request, response);
 
-        verify(response).isCourseNotFound();
+        verify(response).courseNotFound();
         verifyNoMoreInteractions(response);
-        verifyNoMoreInteractions(emailNotifier, mailSender);
+        verifyNoMoreInteractions(emailNotifier, paymentGateway);
     }
 
     @Test
@@ -92,8 +97,24 @@ public class AddStudentToCourseUseCaseTest {
 
         useCase.execute(request, response);
 
-        verify(response).isFull();
+        verify(response).courseFull();
         verifyNoMoreInteractions(response);
-        verifyNoMoreInteractions(emailNotifier, mailSender);
+        verifyNoMoreInteractions(emailNotifier, paymentGateway);
+    }
+
+    @Test
+    public void add_correct_student_to_curse_payment_fails() {
+
+        when(request.getCourseId()).thenReturn(correctCourseId);
+        when(request.getStudent()).thenReturn(student);
+        when(paymentGateway.payCourse(student, course)).thenReturn(Boolean.FALSE);
+
+        useCase.execute(request, response);
+
+        verify(paymentGateway).payCourse(student, course);
+        verify(response).paymentFailed();
+        verifyNoMoreInteractions(emailNotifier, paymentGateway);
+
+        assertFalse("Student should not be added to the course if payment fails", course.containsStudent(student));
     }
 }

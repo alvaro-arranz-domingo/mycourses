@@ -5,11 +5,13 @@ package com.lastminute.mycourses.domain.model;
  */
 public class Student {
 
+    public Long id;
     public String name;
     public String emailAddress;
     public VisaCard visaCard;
 
-    public Student(String name, String emailAddress, VisaCard visaCard) {
+    public Student(Long id, String name, String emailAddress, VisaCard visaCard) {
+        this.id = id;
         this.name = name;
         this.emailAddress = emailAddress;
         this.visaCard = visaCard;

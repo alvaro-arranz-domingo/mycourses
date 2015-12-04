@@ -38,4 +38,8 @@ public class VolatileMapCourseRepository implements CourseRepository {
     public void save(Course course) {
         courseMap.put(course.getId(), course);
     }
+
+    public void remove(Course course) {
+        courseMap.remove(course.getId());
+    }
 }

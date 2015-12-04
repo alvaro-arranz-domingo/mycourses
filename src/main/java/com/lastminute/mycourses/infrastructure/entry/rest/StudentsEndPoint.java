@@ -2,6 +2,7 @@ package com.lastminute.mycourses.infrastructure.entry.rest;
 
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
+import com.lastminute.mycourses.domain.model.VisaCard;
 import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseRequest;
 import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseResponse;
 import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseUseCase;

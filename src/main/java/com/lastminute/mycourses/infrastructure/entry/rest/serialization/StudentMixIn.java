@@ -8,6 +8,6 @@ import com.lastminute.mycourses.domain.model.VisaCard;
  */
 public class StudentMixIn {
 
-    StudentMixIn(@JsonProperty("name") String name, @JsonProperty("emailAddress") String emailAddress,
+    StudentMixIn(@JsonProperty("id") Long id, @JsonProperty("name") String name, @JsonProperty("emailAddress") String emailAddress,
                  @JsonProperty("visaCard") VisaCard visaCard) {}
 }

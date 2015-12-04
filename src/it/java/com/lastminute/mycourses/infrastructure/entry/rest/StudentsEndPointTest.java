@@ -1,5 +1,6 @@
 package com.lastminute.mycourses.infrastructure.entry.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icegreen.greenmail.util.DummySSLSocketFactory;
 import com.icegreen.greenmail.util.GreenMail;
@@ -57,9 +58,10 @@ public class StudentsEndPointTest {
 
     private Long correctCourseId = 1L;
     private Long incorrectCourseId = 0L;
-    private Course course = CourseMother.createCorrectTestCourse(correctCourseId);
+    private Course course = CourseMother.createCorrectTestCourseForPayment(correctCourseId);
 
-    private Student student = StudentMother.createCorrectTestStudent();
+    private Student studentCorrectVisa = StudentMother.createCorrectTestStudentForPayment(1L);
+    private Student studentIncorrectVisa = StudentMother.createCorrectTestStudent(2L);
 
     private Long fullCourseId = 2L;
     private Course fullCourse = CourseMother.createCorrectTestCourseWithCapacity(fullCourseId, 1);
@@ -73,7 +75,7 @@ public class StudentsEndPointTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        fullCourse.addStudent(student);
+        fullCourse.addStudent(studentCorrectVisa);
 
         repository.save(course);
         repository.save(fullCourse);
@@ -85,12 +87,12 @@ public class StudentsEndPointTest {
         mockMvc.perform(
                 post("/api/courses/" + correctCourseId + "/students")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(student)))
+                .content(objectMapper.writeValueAsString(studentCorrectVisa)))
                 .andExpect(status().isOk());
 
         Message[] messages = greenMailSmtp.getReceivedMessages();
         assertThat("Wrong number of emails sent", messages.length, equalTo(1));
-        assertThat("Wrong email recipient", student.getEmailAddress(), equalTo(messages[0].getAllRecipients()[0].toString()));
+        assertThat("Wrong email recipient", studentCorrectVisa.getEmailAddress(), equalTo(messages[0].getAllRecipients()[0].toString()));
     }
 
     @Test
@@ -99,7 +101,7 @@ public class StudentsEndPointTest {
         mockMvc.perform(
                 post("/api/courses/" + incorrectCourseId + "/students")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(student)))
+                .content(objectMapper.writeValueAsString(studentCorrectVisa)))
                 .andExpect(status().isNotFound());
     }
 
@@ -119,8 +121,21 @@ public class StudentsEndPointTest {
         mockMvc.perform(
                 post("/api/courses/" + fullCourseId + "/students")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(student)))
-                .andExpect(status().isForbidden());
+                .content(objectMapper.writeValueAsString(studentCorrectVisa)))
+                .andExpect(status().isConflict());
+
+        Message[] messages = greenMailSmtp.getReceivedMessages();
+        assertThat("A confirmation email was send when subscribing a student to a full course", messages.length, equalTo(0));
+    }
+
+    @Test
+    public void add_correct_student_incorrect_visa_to_existent_course() throws Exception {
+
+        mockMvc.perform(
+                post("/api/courses/" + fullCourseId + "/students")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(studentIncorrectVisa)))
+                .andExpect(status().isConflict());
 
         Message[] messages = greenMailSmtp.getReceivedMessages();
         assertThat("A confirmation email was send when subscribing a student to a full course", messages.length, equalTo(0));
@@ -129,6 +144,9 @@ public class StudentsEndPointTest {
     @After
     public void tearDown() {
         greenMailSmtp.stop();
+
+        repository.remove(course);
+        repository.remove(fullCourse);
     }
 
 }

@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
+@TestPropertySource(locations="classpath:it.properties")
 @WebAppConfiguration
 public class CoursesEndPointTest {
 
@@ -41,7 +43,7 @@ public class CoursesEndPointTest {
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private CourseRepository repository;
+    private VolatileMapCourseRepository repository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -61,10 +63,9 @@ public class CoursesEndPointTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        VolatileMapCourseRepository volatileRepository = (VolatileMapCourseRepository) repository;
-        expectedNumCourses = volatileRepository.findAll().size() + 2;
-        volatileRepository.save(expectedCourse);
-        volatileRepository.save(otherCourse);
+        expectedNumCourses = repository.findAll().size() + 2;
+        repository.save(expectedCourse);
+        repository.save(otherCourse);
     }
 
     @Test
@@ -110,6 +111,11 @@ public class CoursesEndPointTest {
         Collection<Course> courses = objectMapper.readValue(result.getResponse().getContentAsString(), type);
 
         assertThat("Wrong number of courses returned", courses.size(), equalTo(expectedNumCourses));
+    }
 
+    @Test
+    public void tearDown() {
+        repository.remove(expectedCourse);
+        repository.remove(otherCourse);
     }
 }
