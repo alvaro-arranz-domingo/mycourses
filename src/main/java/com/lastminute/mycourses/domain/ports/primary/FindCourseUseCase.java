@@ -3,7 +3,6 @@ package com.lastminute.mycourses.domain.ports.primary;
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -18,6 +17,6 @@ public class FindCourseUseCase {
     }
 
     public Optional<Course> execute(Long id) {
-        return  courseRepository.findCourseById(id);
+        return  courseRepository.findById(id);
     }
 }

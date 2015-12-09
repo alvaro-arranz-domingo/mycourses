@@ -10,7 +10,9 @@ import java.util.Optional;
  */
 public interface CourseRepository {
 
-    Optional<Course> findCourseById(Long id);
+    Optional<Course> findById(Long id);
 
     Collection<Course> findAll();
+
+    void save(Course course);
 }

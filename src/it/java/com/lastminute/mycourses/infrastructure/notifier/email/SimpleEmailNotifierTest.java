@@ -62,7 +62,6 @@ public class SimpleEmailNotifierTest {
 
     @After
     public void tearDown() {
-
         greenMailSmtp.stop();
     }
 

@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -22,7 +21,7 @@ import static org.mockito.Mockito.when;
  * Created by administrator on 1/12/15.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class FindCourseTest {
+public class FindCourseUseCaseTest {
 
     private FindCourseUseCase useCase;
 
@@ -36,8 +35,8 @@ public class FindCourseTest {
 
     @Before
     public void setUp() {
-        when(courseRepository.findCourseById(existingId)).thenReturn(Optional.of(expectedCourse));
-        when(courseRepository.findCourseById(not(eq(existingId)))).thenReturn(Optional.<Course>empty());
+        when(courseRepository.findById(existingId)).thenReturn(Optional.of(expectedCourse));
+        when(courseRepository.findById(not(eq(existingId)))).thenReturn(Optional.<Course>empty());
 
         useCase = new FindCourseUseCase(courseRepository);
     }

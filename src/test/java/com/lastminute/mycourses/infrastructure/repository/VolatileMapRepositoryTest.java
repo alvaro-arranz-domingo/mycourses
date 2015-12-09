@@ -1,12 +1,10 @@
 package com.lastminute.mycourses.infrastructure.repository;
 
 import com.lastminute.mycourses.domain.model.Course;
-import com.lastminute.mycourses.domain.model.Teacher;
 import com.lastminute.mycourses.domain.model.factory.CourseMother;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -16,9 +14,9 @@ import static org.junit.Assert.*;
 /**
  * Created by administrator on 1/12/15.
  */
-public class VolatileMapCourseRepositoryTest {
+public class VolatileMapRepositoryTest {
 
-    private VolatileMapCourseRepository courseRepository;
+    private VolatileMapRepository<Course> courseRepository;
 
     private Long validCourseId = 1L;
     private Long missingCourseId = 0l;
@@ -32,14 +30,14 @@ public class VolatileMapCourseRepositoryTest {
 
         courseRepository = new VolatileMapCourseRepository();
 
-        courseRepository.save(validCourse);
-        courseRepository.save(otherValidCourse);
+        courseRepository.save(validCourseId, validCourse);
+        courseRepository.save(otherValidCourseId, otherValidCourse);
     }
 
     @Test
     public void save_and_find_a_valid_course() {
 
-        Optional<Course> optionalCourse = courseRepository.findCourseById(validCourse.getId());
+        Optional<Course> optionalCourse = courseRepository.findById(validCourse.getId());
 
         assertEquals("Course", Optional.of(validCourse), optionalCourse);
     }
@@ -47,7 +45,7 @@ public class VolatileMapCourseRepositoryTest {
     @Test
     public void find_non_existent_course() {
 
-        Optional<Course> optionalCourse = courseRepository.findCourseById(missingCourseId);
+        Optional<Course> optionalCourse = courseRepository.findById(missingCourseId);
 
         assertEquals("Course", Optional.empty(), optionalCourse);
     }

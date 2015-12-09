@@ -1,43 +1,40 @@
 package com.lastminute.mycourses.infrastructure.entry.rest;
 
-import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
-import com.lastminute.mycourses.domain.model.VisaCard;
-import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseRequest;
-import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseResponse;
-import com.lastminute.mycourses.domain.ports.primary.AddStudentToCourseUseCase;
-import com.lastminute.mycourses.infrastructure.entry.rest.exceptions.CourseNotFoundException;
+import com.lastminute.mycourses.domain.ports.primary.AddStudentUseCase;
+import com.lastminute.mycourses.domain.ports.primary.FindAllStudentsUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.Collection;
 
 /**
  * Created by administrator on 2/12/15.
  */
 @RestController
-@RequestMapping("/api/courses/{courseId}/students")
+@RequestMapping("/api/students")
 public class StudentsEndPoint {
 
-    private AddStudentToCourseUseCase addStudentToCourseUseCase;
+    private AddStudentUseCase addStudentUseCase;
+    private FindAllStudentsUseCase findAllStudentsUseCase;
 
     @Autowired
-    public StudentsEndPoint(AddStudentToCourseUseCase addStudentToCourseUseCase) {
-        this.addStudentToCourseUseCase = addStudentToCourseUseCase;
+    public StudentsEndPoint(AddStudentUseCase addStudentUseCase, FindAllStudentsUseCase findAllStudentsUseCase) {
+        this.addStudentUseCase = addStudentUseCase;
+        this.findAllStudentsUseCase = findAllStudentsUseCase;
     }
 
     @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> addStudent(@PathVariable Long courseId, @RequestBody Student student) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addStudent(@RequestBody Student student) {
+        addStudentUseCase.execute(student);
+    }
 
-        AddStudentToCourseRestRequest request = new AddStudentToCourseRestRequest(courseId, student);
-        AddStudentToCourseRestResponse response = new AddStudentToCourseRestResponse();
-
-        addStudentToCourseUseCase.execute(request, response);
-
-        return response.getStatus();
+    @RequestMapping(path = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Student> getStudents() {
+        return findAllStudentsUseCase.execute();
     }
 }

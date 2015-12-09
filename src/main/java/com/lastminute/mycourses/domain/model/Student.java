@@ -1,5 +1,8 @@
 package com.lastminute.mycourses.domain.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * Created by administrator on 2/12/15.
  */
@@ -27,5 +30,9 @@ public class Student {
 
     public VisaCard getVisaCard() {
         return visaCard;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

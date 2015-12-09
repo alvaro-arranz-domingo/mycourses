@@ -1,6 +1,8 @@
 package com.lastminute.mycourses.infrastructure.entry.rest;
 
 import com.lastminute.mycourses.domain.model.Course;
+import com.lastminute.mycourses.domain.ports.primary.AddCourseUseCase;
+import com.lastminute.mycourses.domain.ports.primary.AddStudentUseCase;
 import com.lastminute.mycourses.domain.ports.primary.FindAllCoursesUseCase;
 import com.lastminute.mycourses.domain.ports.primary.FindCourseUseCase;
 import com.lastminute.mycourses.infrastructure.entry.rest.exceptions.CourseNotFoundException;
@@ -22,11 +24,13 @@ public class CoursesEndPoint {
 
     private FindCourseUseCase findCourseUseCase;
     private FindAllCoursesUseCase findAllCoursesUseCase;
+    private AddCourseUseCase addCourseUseCase;
 
     @Autowired
-    public CoursesEndPoint(FindCourseUseCase useCase, FindAllCoursesUseCase findAllCoursesUseCase) {
+    public CoursesEndPoint(FindCourseUseCase useCase, FindAllCoursesUseCase findAllCoursesUseCase, AddCourseUseCase addCourseUseCase) {
         this.findCourseUseCase = useCase;
         this.findAllCoursesUseCase = findAllCoursesUseCase;
+        this.addCourseUseCase = addCourseUseCase;
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,5 +51,12 @@ public class CoursesEndPoint {
     public Collection<Course> getCourses() {
 
         return findAllCoursesUseCase.execute();
+    }
+
+    @RequestMapping(path = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addCourse(@RequestBody Course course) {
+
+        addCourseUseCase.execute(course);
     }
 }

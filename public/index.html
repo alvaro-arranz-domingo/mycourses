@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="MyCourses">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>My Courses Management System</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <link href="css/dashboard.css" rel="stylesheet">
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
+
+   <script type="text/javascript" src="app/app.js"></script>
+   <script type="text/javascript" src="app/controllers/dashboard-view-controller.js"></script>
+   <script type="text/javascript" src="app/controllers/show-courses-controller.js"></script>
+   <script type="text/javascript" src="app/controllers/show-students-controller.js"></script>
+</head>
+
+<body ng-controller="DashboardViewController as viewCtrl" ng-cloak>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Courses Manager</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li ng-class="{active:viewCtrl.getActiveView()===1}"><a href="#" ng-click="viewCtrl.setActiveView(1);">Courses</a></li>
+          <li ng-class="{active:viewCtrl.getActiveView()===2}"><a href="#" ng-click="viewCtrl.setActiveView(2);">Students</a></li>
+        </ul>
+        <ul class="nav nav-sidebar">
+          <li ng-class="{active:viewCtrl.getActiveView()===3}"><a href="#" ng-click="viewCtrl.setActiveView(3);">Enrollments</a></li>
+        </ul>
+      </div>
+
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+        <div ng-show="viewCtrl.getActiveView()===1" ng-controller="ShowCoursesController as showCoursesCtrl" ng-cloak>
+          <div class="col-sm-offset-2 col-sm-8 course-div" ng-repeat="course in showCoursesCtrl.courses">
+            <h2>{{course.name}}</h2>
+            <h3>{{course.teacher.name}}</h3>
+            <p>{{course.description}}</p>
+            <p>{{course.price | currency }}
+            <p>For {{course.capacity}} students</p>
+          </div>
+        </div>
+
+        <div ng-show="viewCtrl.getActiveView()===2" ng-controller="ShowStudentsController as showStudentsCtrl" ng-cloak>
+          <div class="col-sm-offset-2 col-sm-8 course-div" ng-repeat="student in showStudentsCtrl.students">
+            <h3>{{student.name}}</h3>
+            <h4>{{student.emailAddress}}</h4>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

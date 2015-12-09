@@ -15,7 +15,7 @@ public class Course {
     private String description;
     private Teacher teacher;
     private BigDecimal price;
-    private Collection<Student> students = new ArrayList<Student>();
+    //private Collection<Student> students = new ArrayList<Student>();
     private Integer capacity;
 
     public Course(Long id, String name, String description, Teacher teacher, BigDecimal price, Integer capacity) {
@@ -47,11 +47,16 @@ public class Course {
         return id;
     }
 
+    public int getCapacity() {
+        return capacity;
+    }
+
     /**
      * Checks if there is enough capacity in the Course. If there is not, it returns false
      * @param student
      * @return
      */
+    /*
     public boolean addStudent(Student student) {
 
         if (students.size() >= capacity) {
@@ -69,10 +74,7 @@ public class Course {
     public boolean containsStudent(Student student) {
         return students.contains(student);
     }
-
-    public int getCapacity() {
-        return capacity;
-    }
+    */
 
     @Override
     public boolean equals(Object o) {
@@ -84,12 +86,11 @@ public class Course {
                 Objects.equals(description, course.description) &&
                 Objects.equals(teacher, course.teacher) &&
                 Objects.equals(price, course.price) &&
-                Objects.equals(students, course.students) &&
                 Objects.equals(capacity, course.capacity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, teacher, price, students, capacity);
+        return Objects.hash(id, name, description, teacher, price, capacity);
     }
 }

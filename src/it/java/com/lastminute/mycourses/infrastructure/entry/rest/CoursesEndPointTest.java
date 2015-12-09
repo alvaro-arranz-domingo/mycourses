@@ -1,17 +1,19 @@
 package com.lastminute.mycourses.infrastructure.entry.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lastminute.mycourses.Application;
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Teacher;
-import com.lastminute.mycourses.domain.ports.secondary.CourseRepository;
 import com.lastminute.mycourses.infrastructure.repository.VolatileMapCourseRepository;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -26,6 +28,7 @@ import java.util.Collection;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -46,7 +49,7 @@ public class CoursesEndPointTest {
     private VolatileMapCourseRepository repository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper mapper;
 
     private Long correctId = 1L;
     private Long otherCorrectId = 2L;
@@ -76,7 +79,7 @@ public class CoursesEndPointTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Course course = objectMapper.readValue(result.getResponse().getContentAsString(), Course.class);
+        Course course = mapper.readValue(result.getResponse().getContentAsString(), Course.class);
 
         assertThat(course, equalTo(expectedCourse));
     }
@@ -105,17 +108,35 @@ public class CoursesEndPointTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        JavaType type = objectMapper.getTypeFactory().
+        JavaType type = mapper.getTypeFactory().
                 constructCollectionType(Collection.class, Course.class);
 
-        Collection<Course> courses = objectMapper.readValue(result.getResponse().getContentAsString(), type);
+        Collection<Course> courses = mapper.readValue(result.getResponse().getContentAsString(), type);
 
         assertThat("Wrong number of courses returned", courses.size(), equalTo(expectedNumCourses));
     }
 
+    /* ADD NEW COURSE */
     @Test
+    public void save_correct_course() throws Exception {
+
+        mockMvc.perform(post("/api/courses")
+                .content(mapper.writeValueAsString(expectedCourse))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void save_incorrect_json_course() throws Exception {
+
+        mockMvc.perform(post("/api/courses")
+                .content("")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @After
     public void tearDown() {
-        repository.remove(expectedCourse);
-        repository.remove(otherCourse);
+        repository.clear();
     }
 }

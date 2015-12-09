@@ -1,16 +1,13 @@
 package com.lastminute.mycourses.infrastructure.entry.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icegreen.greenmail.util.DummySSLSocketFactory;
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetupTest;
 import com.lastminute.mycourses.Application;
 import com.lastminute.mycourses.domain.model.Course;
 import com.lastminute.mycourses.domain.model.Student;
-import com.lastminute.mycourses.domain.model.factory.CourseMother;
 import com.lastminute.mycourses.domain.model.factory.StudentMother;
-import com.lastminute.mycourses.infrastructure.repository.VolatileMapCourseRepository;
+import com.lastminute.mycourses.infrastructure.repository.VolatileMapStudentRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,20 +19,23 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.mail.Message;
-import java.security.Security;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static junit.framework.TestCase.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Created by administrator on 2/12/15.
+ * Created by administrator on 7/12/15.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
@@ -49,104 +49,61 @@ public class StudentsEndPointTest {
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private VolatileMapCourseRepository repository;
+    private VolatileMapStudentRepository studentRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper mapper;
 
-    private GreenMail greenMailSmtp;
-
-    private Long correctCourseId = 1L;
-    private Long incorrectCourseId = 0L;
-    private Course course = CourseMother.createCorrectTestCourseForPayment(correctCourseId);
-
-    private Student studentCorrectVisa = StudentMother.createCorrectTestStudentForPayment(1L);
-    private Student studentIncorrectVisa = StudentMother.createCorrectTestStudent(2L);
-
-    private Long fullCourseId = 2L;
-    private Course fullCourse = CourseMother.createCorrectTestCourseWithCapacity(fullCourseId, 1);
+    private Student student = StudentMother.createCorrectTestStudent(1L);
+    private Student studentOther1 = StudentMother.createCorrectTestStudent(2L);
+    private Student studentOther2 = StudentMother.createCorrectTestStudent(3L);
 
     @Before
     public void setUp() {
-
-        Security.setProperty("ssl.SocketFactory.provider", DummySSLSocketFactory.class.getName());
-        greenMailSmtp = new GreenMail(ServerSetupTest.SMTPS);
-        greenMailSmtp.start();
-
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        fullCourse.addStudent(studentCorrectVisa);
-
-        repository.save(course);
-        repository.save(fullCourse);
+        studentRepository.save(studentOther1);
+        studentRepository.save(studentOther2);
     }
 
     @Test
-    public void add_correct_student_to_existent_course() throws Exception {
+    public void add_new_correct_student() throws Exception {
 
-        mockMvc.perform(
-                post("/api/courses/" + correctCourseId + "/students")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentCorrectVisa)))
-                .andExpect(status().isOk());
-
-        Message[] messages = greenMailSmtp.getReceivedMessages();
-        assertThat("Wrong number of emails sent", messages.length, equalTo(1));
-        assertThat("Wrong email recipient", studentCorrectVisa.getEmailAddress(), equalTo(messages[0].getAllRecipients()[0].toString()));
+        mockMvc.perform(post("/api/students")
+                .content(mapper.writeValueAsString(student))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
     }
 
     @Test
-    public void add_correct_student_to_non_existent_course() throws Exception {
+    public void add_new_incorrect_json_student() throws Exception {
 
-        mockMvc.perform(
-                post("/api/courses/" + incorrectCourseId + "/students")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentCorrectVisa)))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void add_non_json_student_to_existent_course() throws Exception {
-
-        mockMvc.perform(
-                post("/api/courses/" + correctCourseId + "/students")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
+        mockMvc.perform(post("/api/students")
+                .content("")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void add_correct_student_to_full_course() throws Exception {
+    public void get_all_students() throws Exception {
 
-        mockMvc.perform(
-                post("/api/courses/" + fullCourseId + "/students")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentCorrectVisa)))
-                .andExpect(status().isConflict());
+        MvcResult result = mockMvc.perform(get("/api/students")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
 
-        Message[] messages = greenMailSmtp.getReceivedMessages();
-        assertThat("A confirmation email was send when subscribing a student to a full course", messages.length, equalTo(0));
-    }
+        JavaType type = mapper.getTypeFactory().
+                constructCollectionType(Collection.class, Student.class);
 
-    @Test
-    public void add_correct_student_incorrect_visa_to_existent_course() throws Exception {
+        Collection<Student> students = mapper.readValue(result.getResponse().getContentAsString(), type);
+        Collection<Long> studentsIds = students.stream().map(x -> x.getId()).collect(Collectors.toCollection(ArrayList::new));
 
-        mockMvc.perform(
-                post("/api/courses/" + fullCourseId + "/students")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(studentIncorrectVisa)))
-                .andExpect(status().isConflict());
-
-        Message[] messages = greenMailSmtp.getReceivedMessages();
-        assertThat("A confirmation email was send when subscribing a student to a full course", messages.length, equalTo(0));
+        assertTrue("Student is not returned", studentsIds.contains(2L));
+        assertTrue("Student is not returned", studentsIds.contains(3L));
     }
 
     @After
     public void tearDown() {
-        greenMailSmtp.stop();
-
-        repository.remove(course);
-        repository.remove(fullCourse);
+        studentRepository.clear();
     }
-
 }
